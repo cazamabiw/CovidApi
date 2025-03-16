@@ -1,0 +1,16 @@
+{
+  "name": "COVID API Dev Environment",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "extensions": [
+    "ms-dotnettools.csharp",
+    "ms-azuretools.vscode-docker",
+    "ms-vscode-remote.remote-containers"
+  ],
+  "forwardPorts": [5000, 5001, 5432],
+  "postCreateCommand": "dotnet restore",
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "/bin/bash"
+  }
+}

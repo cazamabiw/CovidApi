@@ -1,0 +1,8 @@
+@CovidApi_HostAddress = http://localhost:5085
+
+GET {{CovidApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+### Get all countries
+GET {{CovidApi_HostAddress}}/api/Country/countries
+Accept: application/json
