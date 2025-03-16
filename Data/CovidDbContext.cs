@@ -6,15 +6,17 @@ using Microsoft.EntityFrameworkCore;
 namespace CovidApi.Data;
 
 public partial class CovidDbContext : DbContext
-{
+{   
+     private readonly IConfiguration _configuration;
     public CovidDbContext()
     {
     }
-
-    public CovidDbContext(DbContextOptions<CovidDbContext> options)
+    public CovidDbContext(DbContextOptions<CovidDbContext> options, IConfiguration configuration)
         : base(options)
     {
+        _configuration = configuration;
     }
+
 
     public virtual DbSet<Country> Countries { get; set; }
 
@@ -25,9 +27,13 @@ public partial class CovidDbContext : DbContext
     public virtual DbSet<Vaccinationdatum> Vaccinationdata { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=host.docker.internal;Port=5432;Database=CovidReportSystem;Username=postgres;Password=123456");
-
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            var connectionString = _configuration.GetConnectionString("PostgreSqlConnection");
+            optionsBuilder.UseNpgsql(connectionString);
+        }
+    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Country>(entity =>
