@@ -75,7 +75,7 @@ The database connection is set in appsettings.json:
 If the database schema changes and you need to regenerate the models in C#:
 
 ```bash
-dotnet ef dbcontext scaffold "Host=host.docker.internal;Port=5432;Database=CovidReportSystem;Username=postgres;Password=123456" Npgsql.EntityFrameworkCore.PostgreSQL -o Data/Models --context CovidDbContext --force
+dotnet ef dbcontext scaffold "Host=host.docker.internal;Port=5432;Database=CovidReportSystem;Username=postgres;Password=123456" Npgsql.EntityFrameworkCore.PostgreSQL -o Models --context CovidDbContext --force
 ```
 **What This Does**:
 - Auto-generates entity classes inside Data/Models/
