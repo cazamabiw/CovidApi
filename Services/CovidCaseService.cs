@@ -164,13 +164,15 @@ namespace CovidAPI.Services
                         var week = calendar.GetWeekOfYear(c.DateReported, rule, firstDayOfWeek);
                         return new { c.DateReported.Year, Week = week };
                     })
+                    .OrderBy(g => g.Key.Year)
+                    .ThenBy(g => g.Key.Week)
                     .Select(g => new ChartDataDto
                     {
                         Label = $"W{g.Key.Week}-{g.Key.Year}",
                         Value = g.Sum(c => c.NewCases ?? 0)
                     })
-                    .OrderBy(g => g.Label)
                     .ToList();
+
             }
             catch (Exception ex)
             {
@@ -207,7 +209,7 @@ namespace CovidAPI.Services
             try
             {
                 return _unitOfWork.CovidCases.GetAll()
-                    .Where(c => c.Country.ToLower() == country.ToLower())
+                    .Where(c => string.Equals(c.Country, country, StringComparison.OrdinalIgnoreCase))
                     .OrderBy(c => c.DateReported)
                     .Select(c => new ChartDataDto
                     {
