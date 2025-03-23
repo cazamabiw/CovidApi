@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 
 namespace CovidApi.Models;
 
-public partial class User
+public class User
 {
-    public int Userid { get; set; }
-
-    public string? Username { get; set; }
-
-    public string? PasswordHash { get; set; }
-
-    public string? Role { get; set; }
+    public int UserID { get; set; }
+    public string Username { get; set; }
+    public string PasswordHash { get; set; }
+    public string Role { get; set; }
 }

@@ -1,4 +1,6 @@
 using CovidApi.Data;
+using CovidAPI.Interfaces;
+using CovidAPI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,12 +10,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var connectionString = builder.Configuration.GetConnectionString("PostgreSqlConnection");
-builder.Services.AddDbContext<CovidDbContext>(options =>
-    options.UseNpgsql(connectionString));
-// Test logging
-Console.WriteLine($"DB Connection: {connectionString}");
 
+builder.Services.AddDbContext<CovidDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection")),
+    ServiceLifetime.Singleton); //Singleton pattern
+
+builder.Services.AddScoped<ICovidCaseService, CovidCaseService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 //Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

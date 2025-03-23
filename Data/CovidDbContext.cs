@@ -1,117 +1,64 @@
-﻿using System;
-using System.Collections.Generic;
-using CovidApi.Models;
+﻿using CovidApi.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CovidApi.Data;
 
 public partial class CovidDbContext : DbContext
-{   
-     private readonly IConfiguration _configuration;
-    public CovidDbContext()
-    {
-    }
-    public CovidDbContext(DbContextOptions<CovidDbContext> options, IConfiguration configuration)
-        : base(options)
-    {
-        _configuration = configuration;
-    }
+{
+    public CovidDbContext(DbContextOptions<CovidDbContext> options) : base(options) { }
 
+    public DbSet<CovidCase> CovidCases { get; set; }
+    public DbSet<VaccinationData> VaccinationData { get; set; }
+    public DbSet<User> Users { get; set; }
 
-    public virtual DbSet<Country> Countries { get; set; }
-
-    public virtual DbSet<Covidcase> Covidcases { get; set; }
-
-    public virtual DbSet<User> Users { get; set; }
-
-    public virtual DbSet<Vaccinationdatum> Vaccinationdata { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-            var connectionString = _configuration.GetConnectionString("PostgreSqlConnection");
-            optionsBuilder.UseNpgsql(connectionString);
-        }
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Country>(entity =>
+        modelBuilder.Entity<CovidCase>(entity =>
         {
-            entity.HasKey(e => e.Countryid).HasName("countries_pkey");
-
-            entity.ToTable("countries");
-
-            entity.Property(e => e.Countryid).HasColumnName("countryid");
-            entity.Property(e => e.CountryName)
-                .HasMaxLength(100)
-                .HasColumnName("country_name");
-            entity.Property(e => e.Region)
-                .HasMaxLength(100)
-                .HasColumnName("region");
+            entity.ToTable("covidcases");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.DateReported).HasColumnName("date_reported");
+            entity.Property(e => e.CountryCode).HasColumnName("country_code");
+            entity.Property(e => e.Country).HasColumnName("country");
+            entity.Property(e => e.WhoRegion).HasColumnName("who_region");
+            entity.Property(e => e.NewCases).HasColumnName("new_cases");
+            entity.Property(e => e.CumulativeCases).HasColumnName("cumulative_cases");
+            entity.Property(e => e.NewDeaths).HasColumnName("new_deaths");
+            entity.Property(e => e.CumulativeDeaths).HasColumnName("cumulative_deaths");
         });
 
-        modelBuilder.Entity<Covidcase>(entity =>
+        modelBuilder.Entity<VaccinationData>(entity =>
         {
-            entity.HasKey(e => e.Caseid).HasName("covidcases_pkey");
-
-            entity.ToTable("covidcases");
-
-            entity.Property(e => e.Caseid).HasColumnName("caseid");
-            entity.Property(e => e.Countryid).HasColumnName("countryid");
-            entity.Property(e => e.Date).HasColumnName("date");
-            entity.Property(e => e.NewCases).HasColumnName("new_cases");
-            entity.Property(e => e.NewDeaths).HasColumnName("new_deaths");
-            entity.Property(e => e.NewRecoveries).HasColumnName("new_recoveries");
-            entity.Property(e => e.TotalCases).HasColumnName("total_cases");
-            entity.Property(e => e.TotalDeaths).HasColumnName("total_deaths");
-            entity.Property(e => e.TotalRecoveries).HasColumnName("total_recoveries");
-
-            entity.HasOne(d => d.Country).WithMany(p => p.Covidcases)
-                .HasForeignKey(d => d.Countryid)
-                .HasConstraintName("covidcases_countryid_fkey");
+            entity.ToTable("vaccinationdata");
+            entity.HasKey(e => e.VaccineID);
+            entity.Property(e => e.VaccineID).HasColumnName("vaccineID");
+            entity.Property(e => e.Country).HasColumnName("country");
+            entity.Property(e => e.Iso3).HasColumnName("iso3");
+            entity.Property(e => e.WhoRegion).HasColumnName("who_region");
+            entity.Property(e => e.DataSource).HasColumnName("data_source");
+            entity.Property(e => e.DateUpdated).HasColumnName("date_updated");
+            entity.Property(e => e.TotalVaccinations).HasColumnName("total_vaccinations");
+            entity.Property(e => e.PersonsVaccinated1PlusDose).HasColumnName("persons_vaccinated_1plus_dose");
+            entity.Property(e => e.TotalVaccinationsPer100).HasColumnName("total_vaccinations_per100");
+            entity.Property(e => e.PersonsVaccinated1PlusDosePer100).HasColumnName("persons_vaccinated_1plus_dose_per100");
+            entity.Property(e => e.PersonsLastDose).HasColumnName("persons_last_dose");
+            entity.Property(e => e.PersonsLastDosePer100).HasColumnName("persons_last_dose_per100");
+            entity.Property(e => e.VaccinesUsed).HasColumnName("vaccines_used");
+            entity.Property(e => e.FirstVaccineDate).HasColumnName("first_vaccine_date");
+            entity.Property(e => e.NumberVaccineTypesUsed).HasColumnName("number_vaccine_types_used");
+            entity.Property(e => e.PersonsBoosterAddDose).HasColumnName("persons_booster_add_dose");
+            entity.Property(e => e.PersonsBoosterAddDosePer100).HasColumnName("persons_booster_add_dose_per100");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Userid).HasName("users_pkey");
-
             entity.ToTable("users");
-
-            entity.Property(e => e.Userid).HasColumnName("userid");
-            entity.Property(e => e.PasswordHash)
-                .HasMaxLength(255)
-                .HasColumnName("password_hash");
-            entity.Property(e => e.Role)
-                .HasMaxLength(50)
-                .HasColumnName("role");
-            entity.Property(e => e.Username)
-                .HasMaxLength(100)
-                .HasColumnName("username");
+            entity.HasKey(e => e.UserID);
+            entity.Property(e => e.UserID).HasColumnName("userID");
+            entity.Property(e => e.Username).HasColumnName("username");
+            entity.Property(e => e.PasswordHash).HasColumnName("password_hash");
+            entity.Property(e => e.Role).HasColumnName("role");
         });
-
-        modelBuilder.Entity<Vaccinationdatum>(entity =>
-        {
-            entity.HasKey(e => e.Vaccineid).HasName("vaccinationdata_pkey");
-
-            entity.ToTable("vaccinationdata");
-
-            entity.Property(e => e.Vaccineid).HasColumnName("vaccineid");
-            entity.Property(e => e.Countryid).HasColumnName("countryid");
-            entity.Property(e => e.Date).HasColumnName("date");
-            entity.Property(e => e.NewVaccinated).HasColumnName("new_vaccinated");
-            entity.Property(e => e.TotalVaccinated).HasColumnName("total_vaccinated");
-            entity.Property(e => e.VaccineType)
-                .HasMaxLength(100)
-                .HasColumnName("vaccine_type");
-
-            entity.HasOne(d => d.Country).WithMany(p => p.Vaccinationdata)
-                .HasForeignKey(d => d.Countryid)
-                .HasConstraintName("vaccinationdata_countryid_fkey");
-        });
-
-        OnModelCreatingPartial(modelBuilder);
     }
-
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

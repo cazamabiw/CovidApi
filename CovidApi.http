@@ -3,6 +3,15 @@
 GET {{CovidApi_HostAddress}}/weatherforecast/
 Accept: application/json
 
-### Get all countries
-GET {{CovidApi_HostAddress}}/api/Country/countries
+### GET all CovidCases
+GET {{CovidApi_HostAddress}}/api/CovidCases
 Accept: application/json
+
+### GET CovidCase by ID
+GET {{CovidApi_HostAddress}}/api/CovidCases/1
+Accept: application/json
+
+### GET Get Latest CovidCases By Country
+GET {{CovidApi_HostAddress}}/api/CovidCases/latest?country=Canada
+Accept: application/json
+
