@@ -32,7 +32,7 @@ public partial class CovidDbContext : DbContext
         {
             entity.ToTable("vaccinationdata");
             entity.HasKey(e => e.VaccineID);
-            entity.Property(e => e.VaccineID).HasColumnName("vaccineID");
+            entity.Property(e => e.VaccineID).HasColumnName("vaccineid");
             entity.Property(e => e.Country).HasColumnName("country");
             entity.Property(e => e.Iso3).HasColumnName("iso3");
             entity.Property(e => e.WhoRegion).HasColumnName("who_region");

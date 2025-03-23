@@ -13,15 +13,36 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<CovidDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection")),
-    ServiceLifetime.Singleton); //Singleton pattern
+    ServiceLifetime.Scoped);
 
 builder.Services.AddScoped<ICovidCaseService, CovidCaseService>();
+builder.Services.AddScoped<IVaccinationDataService, VaccinationDataService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 //Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Read allowed origins from config
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+// Add CORS with validation
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(allowedOrigins ?? Array.Empty<string>())
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
+
+// Use CORS
+app.UseCors("AllowFrontend");
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

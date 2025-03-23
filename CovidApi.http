@@ -33,3 +33,11 @@ Accept: application/json
 GET {{CovidApi_HostAddress}}/api/CovidCases/trend?country=Canada
 Accept: application/json
 ###
+
+### Top 10 vaccinated countries
+GET {{CovidApi_HostAddress}}/api/VaccinationData/top-vaccinations
+Accept: application/json
+
+### Get total vaccine data for a country
+GET {{CovidApi_HostAddress}}/api/VaccinationData/trend?country=Canada
+Accept: application/json
