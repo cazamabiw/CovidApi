@@ -85,3 +85,63 @@ dotnet ef dbcontext scaffold "Host=host.docker.internal;Port=5432;Database=Covid
 **Important**:
 - Only run this command if the database schema has changed.
 - Always review generated models before committing to Git.
+
+---
+## Design Patterns in This Project
+In this project, I use two important design patterns: Repository and Unit of Work.
+
+### **1. Repository Pattern**
+
+#### What is Repository?
+The repository pattern helps manage database logic separately from other parts of your app. It means your app doesn’t talk directly to the database. Instead, it uses a special class called a "repository" to handle all database actions.
+
+#### Why use Repository?
+- Keeps database code organized.
+- Makes the code easy to manage.
+- Easy to test.
+
+#### Example:
+- `ICovidCaseRepository` is the interface for database actions.
+- `CovidCaseRepository` is the actual class that talks to the database using Entity Framework Core.
+```bash
+public interface ICovidCaseRepository : IRepository<CovidCase>
+{
+    IEnumerable<CovidCase> GetLatestCasesByCountry(string country);
+}
+```
+
+### 2. Unit of Work Pattern
+
+#### What is Unit of Work?
+The Unit of Work groups many database actions together in one single transaction. This means all changes to the database happen together, making your data safer.
+
+#### Why use Unit of Work?
+- Helps keep your data safe by doing all database actions at once.
+- Avoids repeating database connection code.
+- Makes your code clear and organized.
+
+#### Example:
+- `IUnitOfWork` interface manages different repositories and save changes to the database.
+- `UnitOfWork` class uses repositories and does the database transaction.
+```bash
+public interface IUnitOfWork : IDisposable
+{
+    ICovidCaseRepository CovidCases { get; }
+    int Complete();
+}
+```
+### Benefits of These Patterns:
+- Clear Code: Easy to understand.
+- Maintainable: Easy to change or update.
+- Testable: Simple to write tests for your app.
+- Safe Database Transactions: Ensures all database operations complete or fail together.
+
+### How the Layers Work Together:
+``` Controller → Service → Unit of Work → Repository → Database ```
+| Layer  | What it Does |
+| ------------- | ------------- |
+| Controller  | Gets user requests and sends responses.  |
+| Service  | Handles business logic and data mapping.  |
+| Unit of Work  | Manages repositories and transactions.  |
+| Repository  | Deals directly with the database.  |
+| Database  | Stores all data.  |
