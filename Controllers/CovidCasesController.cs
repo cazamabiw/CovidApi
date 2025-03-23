@@ -67,4 +67,25 @@ public class CovidCasesController : ControllerBase
         _covidCaseService.DeleteCase(id);
         return NoContent();
     }
+
+    [HttpGet("global-weekly")]
+    public ActionResult<IEnumerable<ChartDataDto>> GetGlobalWeeklyCases()
+    {
+        return Ok(_covidCaseService.GetGlobalWeeklyCases());
+    }
+
+    [HttpGet("top-countries")]
+    public ActionResult<IEnumerable<ChartDataDto>> GetTop10CountriesByCases()
+    {
+        return Ok(_covidCaseService.GetTop10CountriesByCases());
+    }
+
+    [HttpGet("trend")]
+    public ActionResult<IEnumerable<ChartDataDto>> GetCountryTrend([FromQuery] string country)
+    {
+        if (string.IsNullOrWhiteSpace(country))
+            return BadRequest("Country name is required");
+
+        return Ok(_covidCaseService.GetCountryTrend(country));
+    }
 }

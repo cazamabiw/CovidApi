@@ -6,12 +6,30 @@ Accept: application/json
 ### GET all CovidCases
 GET {{CovidApi_HostAddress}}/api/CovidCases
 Accept: application/json
+###
 
 ### GET CovidCase by ID
 GET {{CovidApi_HostAddress}}/api/CovidCases/1
 Accept: application/json
+###
 
 ### GET Get Latest CovidCases By Country
 GET {{CovidApi_HostAddress}}/api/CovidCases/latest?country=Canada
 Accept: application/json
+###
 
+### Get global weekly trend
+GET {{CovidApi_HostAddress}}/api/CovidCases/global-weekly
+Accept: application/json
+
+###
+
+### Get top 10 countries by total cases
+GET {{CovidApi_HostAddress}}/api/CovidCases/top-countries
+Accept: application/json
+###
+
+### Get trend for a specific country
+GET {{CovidApi_HostAddress}}/api/CovidCases/trend?country=Canada
+Accept: application/json
+###

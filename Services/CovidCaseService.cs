@@ -3,6 +3,7 @@ using System.Linq;
 using CovidApi.Models;
 using CovidAPI.Interfaces;
 using CovidApi.DTOs;
+using System.Globalization;
 namespace CovidAPI.Services
 {
     public class CovidCaseService : ICovidCaseService
@@ -146,5 +147,57 @@ namespace CovidAPI.Services
                 throw;
             }
         }
+        public IEnumerable<ChartDataDto> GetGlobalWeeklyCases()
+        {
+            var culture = CultureInfo.InvariantCulture;
+            var calendar = culture.Calendar;
+            var rule = CalendarWeekRule.FirstFourDayWeek;
+            var firstDayOfWeek = DayOfWeek.Monday;
+
+            return _unitOfWork.CovidCases.GetAll()
+                .Where(c => c.NewCases.HasValue)
+                .AsEnumerable()
+                .GroupBy(c =>
+                {
+                    var week = calendar.GetWeekOfYear(c.DateReported, rule, firstDayOfWeek);
+                    return new { c.DateReported.Year, Week = week };
+                })
+                .Select(g => new ChartDataDto
+                {
+                    Label = $"W{g.Key.Week}-{g.Key.Year}",
+                    Value = g.Sum(c => c.NewCases ?? 0)
+                })
+                .OrderBy(g => g.Label)
+                .ToList();
+        }
+
+        public IEnumerable<ChartDataDto> GetTop10CountriesByCases()
+        {
+            return _unitOfWork.CovidCases.GetAll()
+                .Where(c => c.CumulativeCases.HasValue)
+                .GroupBy(c => c.Country)
+                .Select(g => new ChartDataDto
+                {
+                    Label = g.Key,
+                    Value = g.Max(c => c.CumulativeCases ?? 0)
+                })
+                .OrderByDescending(c => c.Value)
+                .Take(10)
+                .ToList();
+        }
+
+        public IEnumerable<ChartDataDto> GetCountryTrend(string country)
+        {
+            return _unitOfWork.CovidCases.GetAll()
+                .Where(c => c.Country.ToLower() == country.ToLower())
+                .OrderBy(c => c.DateReported)
+                .Select(c => new ChartDataDto
+                {
+                    Label = c.DateReported.ToString("yyyy-MM-dd"),
+                    Value = c.NewCases ?? 0
+                })
+                .ToList();
+        }
+
     }
 }
